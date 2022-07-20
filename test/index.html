@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ID Widget</title>
+    <script src="https://lpcdn.lpsnmedia.net/webagent/client-SDK.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+</head>
+
+<body>
+<h1>Auth SDES widget</h1>
+<div class="logBox">
+    <textarea disabled style="width: 100%; height: 200px;"></textarea>
+</div>
+<script>
+
+    var pathToAuthenticatedData = "authenticatedData.customerDetails";
+    var pathToUnauthenticatedData = "SDE.customerDetails";
+
+    //Init SDK event handlers
+    var updateAuthenticatedDataCallback = getLogFunction('INFO', '-----------> updateAuthenticatedDataCallback called');
+
+    var updateUnauthenticatedDataCallback = getLogFunction('INFO', '-----> updateUnauthenticatedDataCallback called');
+
+    var notifyWhenDone = getLogFunction('INFO', 'notifyWhenDone called');
+
+    function initialBinds() {
+        lpTag.agentSDK.bind(pathToAuthenticatedData, updateAuthenticatedDataCallback, notifyWhenDone);
+        logger('INFO', 'lpTag.agentSDK.bind setup for: ' + pathToAuthenticatedData);
+        lpTag.agentSDK.bind(pathToUnauthenticatedData, updateUnauthenticatedDataCallback, notifyWhenDone);
+        logger('INFO', 'lpTag.agentSDK.bind setup for: ' + pathToUnauthenticatedData);
+    }
+
+    lpTag.agentSDK.init({});
+    logger('INFO', 'lpTag.agentSDK.init called');
+
+    initialBinds();
+
+    function getLogFunction(type, message){
+        return function(data) {
+            if (typeof data === 'object') {
+                data = JSON.stringify(data, null, 2);
+            }
+            logger(type, message + ' The ' + type + ' data: ' + data);
+        }
+    }
+
+    function logger(type, text){
+        if (typeof text === 'object') {
+            text = JSON.stringify(text, null, 2);
+        }
+        var area = $(".logBox textarea");
+        area.val(new Date().toTimeString() + ":  " + type + " - " + text + '\n' + area.val());
+    }
+
+</script>
+</body>
+
+</html>
