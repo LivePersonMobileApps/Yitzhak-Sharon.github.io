@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <groupId>com.liveperson.webagent</groupId>
+    <artifactId>sdk-examples</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <parent>
+        <groupId>com.liveperson.maven</groupId>
+        <artifactId>liveperson-parent</artifactId>
+        <version>3.2.86</version>
+    </parent>
+
+    <properties>
+        <rpm.name>sdk-examples</rpm.name>
+        <app.name>sdk-examples</app.name>
+        <app.description>Web Agent client SDK examples</app.description>
+        <svn.path.to.manifest><!-- PATH_TO_MANIFEST_IN_LP_ENVIRONMENT --></svn.path.to.manifest>
+        <git.url>https://lpgithub.dev.lprnd.net/WebAgent/sdk-examples.git</git.url>
+    </properties>
+
+    <scm>
+        <connection>scm:git:${git.url}</connection>
+        <developerConnection>scm:git:${git.url}</developerConnection>
+        <url>${git.url}</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <activation>
+                <property>
+                    <name>teamcity.build.id</name>
+                </property>
+            </activation>
+            <build>
+                <!--<plugins>-->
+                    <!--<plugin>-->
+                        <!--<artifactId>exec-maven-plugin</artifactId>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<executions>-->
+                            <!--&lt;!&ndash;-->
+                            <!--The following execution:-->
+                            <!--1. reads the package.json of each module and finds their dependencies ++ devDependencies-->
+                            <!--2. figures out which deps were given-->
+                            <!--3. figures out which deps are external-->
+                            <!--4. orders the modules so that linking can be in a safe order without having to query npmjs.org-->
+                            <!--&ndash;&gt;-->
+                            <!--<execution>-->
+                                <!--<id>Install Packages</id>-->
+                                <!--<phase>validate</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>exec</goal>-->
+                                <!--</goals>-->
+                                <!--<configuration>-->
+                                    <!--<workingDirectory>.</workingDirectory>-->
+                                    <!--<executable>npm</executable>-->
+                                    <!--<arguments>-->
+                                        <!--<argument>install</argument>-->
+                                        <!--<argument>-l</argument>-->
+                                        <!--<argument>--save-dev</argument>-->
+                                    <!--</arguments>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                            <!--&lt;!&ndash;-->
+                            <!--The following execution:-->
+                            <!--1. Runs the grunt command-->
+                            <!--2. GruntJS task runner will run all the tasks define in the 'GruntFile'-->
+                            <!--&ndash;&gt;-->
+                            <!--<execution>-->
+                                <!--<id>Run GruntJS</id>-->
+                                <!--<phase>compile</phase>-->
+                                <!--<goals>-->
+                                    <!--<goal>exec</goal>-->
+                                <!--</goals>-->
+                                <!--<configuration>-->
+                                    <!--<workingDirectory>.</workingDirectory>-->
+                                    <!--<executable>grunt</executable>-->
+                                    <!--<arguments>-->
+                                        <!--<argument>--buildVersion=${project.version}_${build.number}</argument>-->
+                                        <!--<argument>--buildType=${buildtype}</argument>-->
+                                    <!--</arguments>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                <!--</plugins>-->
+            </build>
+        </profile>
+        <!--<profile>-->
+            <!--<id>deploy</id>-->
+            <!--<activation>-->
+                <!--<os>-->
+                    <!--<family>unix</family>-->
+                <!--</os>-->
+            <!--</activation>-->
+            <!--<build>-->
+                <!--<plugins>-->
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>rpm-maven-plugin</artifactId>-->
+                        <!--<version>2.1-alpha-2</version>-->
+                        <!--<extensions>true</extensions>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>rpm_version</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>version</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                            <!--</execution>-->
+
+                            <!--&lt;!&ndash; This execution creates the RPM containing the 'lp-rendering' static content &ndash;&gt;-->
+                            <!--<execution>-->
+                                <!--<id>WAR_RPM</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>version</goal>-->
+                                    <!--<goal>rpm</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                                <!--<configuration>-->
+                                    <!--<name>${rpm.name}</name>-->
+                                    <!--<workarea>/tmp/lp-rpm</workarea>-->
+                                    <!--<projversion>${rpm.version}</projversion>-->
+                                    <!--<release>${buildtype}_${build.number}</release>-->
+                                    <!--<packager>ci_user</packager>-->
+                                    <!--<group>Application/LivePerson</group>-->
+                                    <!--<summary>skeletonjs content</summary>-->
+                                    <!--<description>${app.description}</description>-->
+                                    <!--<mappings>-->
+                                        <!--<mapping>-->
+                                            <!--&lt;!&ndash; Apache document root &ndash;&gt;-->
+                                            <!--<directory>/liveperson/code/server_apache/htdocs/</directory>-->
+                                            <!--&lt;!&ndash; Nginx document root &ndash;&gt;-->
+                                            <!--&lt;!&ndash;<directory>/liveperson/code/server_openresty/nginx/html/</directory>&ndash;&gt;-->
+                                            <!--<filemode>750</filemode>-->
+                                            <!--<username>web</username>-->
+                                            <!--<groupname>web</groupname>-->
+                                            <!--<sources>-->
+                                                <!--<source>-->
+                                                    <!--<location>dest</location>-->
+                                                    <!--<includes>-->
+                                                        <!--<include>skeletonjs.min.js</include>-->
+                                                    <!--</includes>-->
+                                                <!--</source>-->
+                                            <!--</sources>-->
+                                        <!--</mapping>-->
+                                    <!--</mappings>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+
+                    <!--&lt;!&ndash; Plugin for uploading to yum repository &ndash;&gt;-->
+                    <!--<plugin>-->
+                        <!--<groupId>com.liveperson.maven.lp-yum-plugin</groupId>-->
+                        <!--<artifactId>lp-yum-plugin</artifactId>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>RPM_UPLOAD_TO_CI</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>mksubrepo</goal>-->
+                                    <!--<goal>upload</goal>-->
+                                    <!--<goal>createrepo</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                                <!--<configuration>-->
+                                    <!--<rpmName>${rpm.name}</rpmName>-->
+                                    <!--<reponame>liveperson-ci</reponame>-->
+                                    <!--<subreponame>${rpm.name}</subreponame>-->
+                                    <!--<rpmBuildDir>/tmp/lp-rpm</rpmBuildDir>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+
+                            <!--<execution>-->
+                                <!--<id>RPM_UPLOAD_TO_QA</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>mksubrepo</goal>-->
+                                    <!--<goal>upload</goal>-->
+                                    <!--<goal>createrepo</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                                <!--<configuration>-->
+                                    <!--<rpmName>${rpm.name}</rpmName>-->
+                                    <!--<reponame>liveperson-qa</reponame>-->
+                                    <!--<subreponame>${rpm.name}</subreponame>-->
+                                    <!--<rpmBuildDir>/tmp/lp-rpm</rpmBuildDir>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+
+                    <!--<plugin>-->
+                        <!--<groupId>com.liveperson.maven.deploy</groupId>-->
+                        <!--<artifactId>lp-puppet-deploy-plugin</artifactId>-->
+                        <!--<version>2.9.0.12</version>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>upload ${app.name} puppet modules</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>createsoftlink</goal>-->
+                                    <!--<goal>updatemodules</goal>-->
+                                    <!--<goal>updatemanifest</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>install</phase>-->
+                                <!--<configuration>-->
+                                    <!--<localModulesPath>deployment/puppet/modules</localModulesPath>-->
+                                    <!--<moduleDestination>~/ver_modules/</moduleDestination>-->
+                                    <!--<vermoduleDestination>~/ver_modules/</vermoduleDestination>-->
+                                    <!--<svnManifestsPath>-->
+                                        <!--${svn.path.to.manifest}-->
+                                    <!--</svnManifestsPath>-->
+                                    <!--<projectName>${app.name}</projectName>-->
+                                    <!--<environment>ci</environment>-->
+                                    <!--<rpmVersion>${rpm.version}-${buildtype}_${build.number}</rpmVersion>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                <!--</plugins>-->
+            <!--</build>-->
+        <!--</profile>-->
+
+        <!--<profile>-->
+            <!--<id>release</id>-->
+            <!--<build>-->
+                <!--<plugins>-->
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>rpm-maven-plugin</artifactId>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>SHARK_WAR_RPM</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>version</goal>-->
+                                <!--</goals>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                    <!--<plugin>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>truezip-maven-plugin</artifactId>-->
+                        <!--<version>1.1</version>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>copy-out-files</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>copy</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                                <!--<configuration>-->
+                                    <!--<files>-->
+                                        <!--<file>-->
+                                            <!--<source>src/main/resources/puppet/modules/${app.name}</source>-->
+                                            <!--<outputDirectory>/tmp/lp-rpm/</outputDirectory>-->
+                                            <!--<destName>${rpm.name}-${rpm.version}-${buildtype}_${build.number}.tgz-->
+                                            <!--</destName>-->
+                                        <!--</file>-->
+                                    <!--</files>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                            <!--<execution>-->
+                                <!--<id>remove-a-file</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>remove</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                                <!--<configuration>-->
+                                    <!--<fileset>-->
+                                        <!--<directory>-->
+                                            <!--/tmp/lp-rpm/${rpm.name}-${rpm.version}-${buildtype}_${build.number}.tgz-->
+                                        <!--</directory>-->
+                                        <!--<includes>-->
+                                            <!--<include>**/.svn</include>-->
+                                        <!--</includes>-->
+                                    <!--</fileset>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                    <!--<plugin>-->
+                        <!--<groupId>com.liveperson.maven.lp-yum-plugin</groupId>-->
+                        <!--<artifactId>lp-yum-plugin</artifactId>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>upload ${app.name}</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>releasemksubrepo</goal>-->
+                                    <!--<goal>releaseupload</goal>-->
+                                    <!--<goal>releasecreaterepo</goal>-->
+                                    <!--<goal>releaseuploadmodules</goal>-->
+                                <!--</goals>-->
+                                <!--<phase>package</phase>-->
+                                <!--<configuration>-->
+                                    <!--<lpproduct>${lp-product}</lpproduct>-->
+                                    <!--<checkmarxStatus>${checkmarxStatus}</checkmarxStatus>-->
+                                    <!--<rpmBuildDir>/tmp/lp-rpm</rpmBuildDir>-->
+                                    <!--<rpmName>${rpm.name}</rpmName>-->
+                                    <!--<reponame>liveperson-release</reponame>-->
+                                    <!--<rpmVersion>${rpm.version}-${buildtype}_${build.number}</rpmVersion>-->
+                                    <!--<subreponame>${rpm.name}</subreponame>-->
+                                <!--</configuration>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                <!--</plugins>-->
+            <!--</build>-->
+        <!--</profile>-->
+
+    </profiles>
+
+
+</project>
